@@ -4,17 +4,22 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.firebase.ui.auth.AuthUI;
+import com.firebase.ui.firestore.FirestoreRecyclerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -28,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
 
     private static final String TAG = "MainActivity";
     RecyclerView recyclerView;
-
+    PollRecyclerAdapter pollRecyclerAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         setSupportActionBar(toolbar);
 
         recyclerView=findViewById(R.id.recyclerView);
+        recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
         FloatingActionButton fab = findViewById(R.id.fab);
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -95,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
     protected void onStop() {
         super.onStop();
         FirebaseAuth.getInstance().removeAuthStateListener(this);
+        if(pollRecyclerAdapter!=null){
+            pollRecyclerAdapter.stopListening();
+        }
     }
 
     @Override
@@ -103,12 +112,24 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
             startLoginActivity();
             return;
         }
-        firebaseAuth.getCurrentUser().getIdToken(true)
-                .addOnSuccessListener(new OnSuccessListener<GetTokenResult>() {
-                    @Override
-                    public void onSuccess(GetTokenResult getTokenResult) {
-                        Log.d(TAG,"onSuccess: "+ getTokenResult.getToken());
-                    }
-                });
+        initRecyclerView(firebaseAuth.getCurrentUser());
+    }
+
+    private void initRecyclerView(FirebaseUser user){
+
+        Query query = FirebaseFirestore.getInstance()
+                .collection("questions")
+                .whereEqualTo("userId",user.getUid());
+
+        FirestoreRecyclerOptions<pollInfo> options=new FirestoreRecyclerOptions.Builder<pollInfo>()
+                .setQuery(query, pollInfo.class)
+                .build();
+
+        pollRecyclerAdapter = new PollRecyclerAdapter(options);
+        recyclerView.setAdapter(pollRecyclerAdapter);
+
+        pollRecyclerAdapter.startListening();
+
+
     }
 }

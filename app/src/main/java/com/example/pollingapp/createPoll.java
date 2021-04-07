@@ -3,6 +3,7 @@ package com.example.pollingapp;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,10 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.security.Timestamp;
+import java.security.cert.CertPath;
+import java.util.Date;
 
 public class createPoll extends AppCompatActivity {
     Button create;
@@ -35,6 +40,8 @@ public class createPoll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addPoll();
+                Intent i= new Intent(createPoll.this,MainActivity.class);
+                startActivity(i);
             }
         });
     }

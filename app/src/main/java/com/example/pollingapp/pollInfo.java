@@ -1,10 +1,13 @@
 package com.example.pollingapp;
 
+import java.security.Timestamp;
+
 public class pollInfo {
     private String question;
     private String option1;
     private String option2;
     private String userId;
+
 
     public pollInfo() {
     }
@@ -14,6 +17,7 @@ public class pollInfo {
         this.option1 = option1;
         this.option2 = option2;
         this.userId = userId;
+
     }
 
     public String getQuestion() {
@@ -47,4 +51,6 @@ public class pollInfo {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+
 }
