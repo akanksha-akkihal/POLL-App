@@ -1,6 +1,7 @@
 package com.example.pollingapp;
 
 import android.content.Intent;
+import android.graphics.Canvas;
 import android.os.Bundle;
 
 import com.firebase.ui.auth.AuthUI;
@@ -13,13 +14,17 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
@@ -29,11 +34,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener{
+import java.util.Objects;
+
+import it.xabaras.android.recyclerview.swipedecorator.RecyclerViewSwipeDecorator;
+
+public class MainActivity extends AppCompatActivity implements FirebaseAuth.AuthStateListener, PollRecyclerAdapter.PollListener {
 
     private static final String TAG = "MainActivity";
     RecyclerView recyclerView;
     PollRecyclerAdapter pollRecyclerAdapter;
+    String question,option1,option2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,11 +135,76 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
                 .setQuery(query, pollInfo.class)
                 .build();
 
-        pollRecyclerAdapter = new PollRecyclerAdapter(options);
+        pollRecyclerAdapter = new PollRecyclerAdapter(options , this );
         recyclerView.setAdapter(pollRecyclerAdapter);
 
         pollRecyclerAdapter.startListening();
+        ItemTouchHelper itemTouchHelper= new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
+    };
+
+    final ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            if (direction == ItemTouchHelper.LEFT) {
+                Toast.makeText(MainActivity.this, "Deleting", Toast.LENGTH_SHORT).show();
+
+                PollRecyclerAdapter.PollViewHolder pollViewHolder = (PollRecyclerAdapter.PollViewHolder) viewHolder;
+                pollViewHolder.deleteItem();
+            }
+        }
+
+        @Override
+        public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+            new RecyclerViewSwipeDecorator.Builder(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                    .addBackgroundColor(ContextCompat.getColor(MainActivity.this, R.color.colorPrimaryDark))
+                    .addActionIcon(R.drawable.ic_baseline_delete_24)
+                    .create()
+                    .decorate();
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+        }
+    };
+
+    @Override
+    public void handleDeleteItem(DocumentSnapshot snapshot) {
+        DocumentReference documentReference=snapshot.getReference();
+        pollInfo poll = snapshot.toObject(pollInfo.class);
+        snapshot.getReference().delete();
+
+        Snackbar.make(recyclerView,"Poll deleted",Snackbar.LENGTH_LONG)
+                .setAction("Undo", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        documentReference.set(poll);
+                    }
+                }).show();
 
     }
+
+    @Override
+    public void openPoll(DocumentSnapshot snapshot) {
+        Intent intent=new Intent(this,PollCount.class);
+
+        DocumentReference documentReference=snapshot.getReference();
+        pollInfo poll = snapshot.toObject(pollInfo.class);
+        question=poll.getQuestion().toString();
+        option1=poll.getOption1().toString();
+        option2=poll.getOption2().toString();
+
+        intent.putExtra("question",question);
+        intent.putExtra("option1",option1);
+        intent.putExtra("option2",option2);
+
+
+        startActivity(intent);
+    }
+    
+
 }
+

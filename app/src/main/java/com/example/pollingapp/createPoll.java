@@ -40,7 +40,7 @@ public class createPoll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addPoll();
-                Intent i= new Intent(createPoll.this,MainActivity.class);
+                Intent i= new Intent(createPoll.this,PollCount.class);
                 startActivity(i);
             }
         });
