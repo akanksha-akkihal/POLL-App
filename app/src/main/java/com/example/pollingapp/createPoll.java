@@ -20,6 +20,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.security.Timestamp;
 import java.security.cert.CertPath;
 import java.util.Date;
+import java.util.Random;
 
 public class createPoll extends AppCompatActivity {
     Button create;
@@ -40,7 +41,7 @@ public class createPoll extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addPoll();
-                Intent i= new Intent(createPoll.this,PollCount.class);
+                Intent i= new Intent(createPoll.this,MainActivity.class);
                 startActivity(i);
             }
         });
@@ -51,20 +52,25 @@ public class createPoll extends AppCompatActivity {
         String option2_string= option2.getText().toString().trim();
 
         String userId= FirebaseAuth.getInstance().getCurrentUser().getUid();
-        pollInfo newPoll=new pollInfo(question_string,option1_string,option2_string,userId);
+        Random rand = new Random();
+        int key = rand.nextInt((9999 - 100) + 1) + 10;
+        String docId=Integer.toString(key);
+        pollInfo newPoll=new pollInfo(question_string,option1_string,option2_string,userId,docId,0,0);
 
         FirebaseFirestore.getInstance()
-                .collection("questions")
-                .add(newPoll)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                .collection("questions").document(docId)
+                .set(newPoll)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
+                    public void onSuccess(Void aVoid) {
+                        //Log.d(TAG, "DocumentSnapshot successfully written!");
                         Toast.makeText(createPoll.this,"Poll successfully created",Toast.LENGTH_LONG).show();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
+                        //Log.w(TAG, "Error writing document", e);
                         Toast.makeText(createPoll.this,e.getLocalizedMessage(),Toast.LENGTH_SHORT).show();
                     }
                 });

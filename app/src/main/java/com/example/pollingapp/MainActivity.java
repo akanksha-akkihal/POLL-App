@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
     private static final String TAG = "MainActivity";
     RecyclerView recyclerView;
     PollRecyclerAdapter pollRecyclerAdapter;
-    String question,option1,option2;
+    String question,option1,option2,docId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.action_profile:
-                Toast.makeText(this,"Profile",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this,"Profile",Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(MainActivity.this,ProfileActivity.class));
                 return true;
         }
 
@@ -196,10 +197,12 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
         question=poll.getQuestion().toString();
         option1=poll.getOption1().toString();
         option2=poll.getOption2().toString();
+        docId=poll.getDocId().toString();
 
         intent.putExtra("question",question);
         intent.putExtra("option1",option1);
         intent.putExtra("option2",option2);
+        intent.putExtra("docId",docId);
 
 
         startActivity(intent);
