@@ -14,6 +14,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GetTokenResult;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -32,6 +33,8 @@ import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Objects;
@@ -44,12 +47,18 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
     RecyclerView recyclerView;
     PollRecyclerAdapter pollRecyclerAdapter;
     String question,option1,option2,docId;
+    String ques,opt1,opt2,id;
+    EditText code;
+    Button go;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        code=(EditText)findViewById(R.id.enterCode);
+        go=(Button)findViewById(R.id.takePoll);
 
         recyclerView=findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL));
@@ -62,6 +71,44 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
 //                        .setAction("Action", null).show();
                 Intent i = new Intent(MainActivity.this,createPoll.class);
                 startActivity(i);
+
+            }
+        });
+
+        go.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String docId=code.getText().toString().trim();
+                DocumentReference doc=FirebaseFirestore.getInstance().collection("questions")
+                        .document(docId);
+                //Toast.makeText(getApplicationContext(), docId, Toast.LENGTH_LONG).show();
+                doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                ques=document.getString("question");
+                                opt1=document.getString("option1");
+                                opt2=document.getString("option2");
+                                id=document.getString("docId");
+
+                                Intent i = new Intent(MainActivity.this,UserPoll.class);
+                                i.putExtra("question", ques);
+                                i.putExtra("option1", opt1);
+                                i.putExtra("option2", opt2);
+                                i.putExtra("docId", id);
+                                startActivity(i);
+                                //Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                                Toast.makeText(getApplicationContext(), ques, Toast.LENGTH_LONG).show();
+                            } else {
+                                Log.d(TAG, "No such document");
+                            }
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
 
             }
         });
@@ -207,7 +254,9 @@ public class MainActivity extends AppCompatActivity implements FirebaseAuth.Auth
 
         startActivity(intent);
     }
-    
+
+
+
 
 }
 

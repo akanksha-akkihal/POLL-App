@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PollingApp">
-        <activity android:name=".PollCount"></activity>
+        <activity android:name=".UserPoll"></activity>
+        <activity android:name=".PollCount" />
         <activity android:name=".createPoll" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".LoginRegisterActivity" />
