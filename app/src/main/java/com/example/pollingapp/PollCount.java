@@ -19,6 +19,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -76,5 +77,39 @@ public class PollCount extends AppCompatActivity {
         String mimeType= "text/plain";
         ShareCompat.IntentBuilder.from(PollCount.this)
                 .setType(mimeType).setText(code).startChooser();
+    }
+
+    public void viewResults(View view){
+        DocumentReference doc= FirebaseFirestore.getInstance().collection("questions")
+                .document(docId);
+        //Toast.makeText(getApplicationContext(), docId, Toast.LENGTH_LONG).show();
+        doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+
+                        String opt1=document.getString("option1");
+                        String opt2=document.getString("option2");
+                        int count1=document.getLong("count1").intValue();
+                        int count2=document.getLong("count2").intValue();
+
+                        Intent i = new Intent(PollCount.this,Result.class);
+                        i.putExtra("count1", count1);
+                        i.putExtra("count2", count2);
+                        i.putExtra("opt1", opt1);
+                        i.putExtra("opt2", opt2);
+                        startActivity(i);
+
+                    } else {
+                        //Log.d(TAG, "No such document");
+                    }
+                } else {
+                    //Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
     }
 }
