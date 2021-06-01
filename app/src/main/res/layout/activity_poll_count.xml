@@ -16,9 +16,7 @@
         android:gravity="center"
         android:text="Take the POLL"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/ques"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -26,20 +24,23 @@
         android:id="@+id/ques"
         android:layout_width="286dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="175dp"
+        android:layout_marginEnd="24dp"
         android:gravity="center"
         android:text="TextView"
         android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/radioGroup2"
-        app:layout_constraintTop_toBottomOf="@+id/textView4"
-        tools:layout_editor_absoluteX="63dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RadioGroup
-        android:id="@+id/radioGroup2"
         android:layout_width="301dp"
         android:layout_height="235dp"
-        app:layout_constraintBottom_toTopOf="@+id/submit"
-        app:layout_constraintTop_toBottomOf="@+id/ques"
-        tools:layout_editor_absoluteX="55dp">
+        android:layout_marginTop="280dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <RadioButton
             android:id="@+id/opt1"
@@ -62,12 +63,13 @@
         android:id="@+id/submit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="144dp"
         android:onClick="onRadioButtonClicked"
         android:text="Submit"
         android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="555dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/share"
