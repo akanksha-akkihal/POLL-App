@@ -48,7 +48,7 @@ public class Result extends AppCompatActivity {
         Pie pie= AnyChart.pie();
         List<DataEntry> dataEntries=new ArrayList<>();
         String c1=Integer.toString(count1);
-        Toast.makeText(getApplicationContext(),c1, Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(),c1, Toast.LENGTH_LONG).show();
         dataEntries.add(new ValueDataEntry(opt1, count1));
         dataEntries.add(new ValueDataEntry(opt2, count2));
 

@@ -50,7 +50,7 @@ public class UserPoll extends AppCompatActivity {
 
         if (option1.isChecked()) {
             doc.update("count1", FieldValue.increment(1));
-            Toast.makeText(this, "voted for opt1" + docId, Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "voted for opt1" , Toast.LENGTH_LONG).show();
         } else if (option2.isChecked()) {
             doc.update("count2", FieldValue.increment(1));
             Toast.makeText(this, "voted for opt2", Toast.LENGTH_LONG).show();
